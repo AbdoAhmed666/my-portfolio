@@ -1,9 +1,13 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import myPhoto from "./assets/me.jpg"; // ضع صورتك داخل مجلد src/assets وسميها me.jpg
+import myPhoto from "./assets/me.jpg";
 
 export default function App() {
+  useEffect(() => {
+    // Smooth scroll behavior
+    document.documentElement.style.scrollBehavior = "smooth";
+  }, []);
+
   const skills = [
     "Python", "Machine Learning", "Deep Learning", "MLOps", "Docker",
     "FastAPI", "TensorFlow", "PyTorch", "IoT", "Firebase"
@@ -34,9 +38,11 @@ export default function App() {
     <div className="bg-gradient-to-b from-[#050811] via-[#0b1220] to-[#121a2f] text-white min-h-screen font-['JetBrains_Mono']">
       
       {/* ===== Navbar ===== */}
-      <nav className="flex justify-between items-center px-10 py-5 bg-[#0b1220]/70 backdrop-blur-md border-b border-gray-800 shadow-md fixed top-0 left-0 right-0 z-50">
-        <h1 className="text-2xl font-bold text-indigo-400 tracking-wide">Abdelrhman Ahmed</h1>
-        <div className="space-x-6 text-sm">
+      <nav className="flex flex-wrap justify-between items-center px-6 md:px-10 py-5 bg-[#0b1220]/70 backdrop-blur-md border-b border-gray-800 shadow-md fixed top-0 left-0 right-0 z-50">
+        <h1 className="text-xl md:text-2xl font-bold text-indigo-400 tracking-wide">
+          Abdelrhman Ahmed
+        </h1>
+        <div className="space-x-4 md:space-x-6 text-sm mt-3 md:mt-0">
           {["About", "Projects", "Skills", "Contact"].map((item, i) => (
             <a key={i} href={`#${item.toLowerCase()}`} className="hover:text-indigo-400 transition">
               {item}
@@ -46,27 +52,27 @@ export default function App() {
       </nav>
 
       {/* ===== Hero Section ===== */}
-      <section className="flex flex-col items-center text-center py-48 px-6">
+      <section className="flex flex-col items-center text-center py-44 md:py-48 px-4 md:px-6">
         <motion.img
           src={myPhoto}
           alt="Abdelrhman Ahmed"
-          className="w-40 h-40 rounded-full mb-8 border-4 border-indigo-500 shadow-lg shadow-indigo-500/40 object-cover"
+          className="w-32 h-32 md:w-40 md:h-40 rounded-full mb-6 border-4 border-indigo-500 shadow-lg shadow-indigo-500/40 object-cover"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
         />
 
         <motion.h2 
-          className="text-5xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent"
+          className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-6 bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          Abdelrhman Ahmed — AI & IoT Engineer
+          Abdelrhman Ahmed — AI & Data Science Engineer
         </motion.h2>
 
         <motion.p 
-          className="max-w-2xl text-gray-400 text-lg mb-10 leading-relaxed"
+          className="max-w-2xl text-gray-400 text-base md:text-lg mb-10 leading-relaxed px-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}
@@ -75,14 +81,14 @@ export default function App() {
           Turning ideas into real-time deployable machine learning applications.
         </motion.p>
 
-        <div className="space-x-4">
+        <div className="flex flex-wrap justify-center gap-4">
           <a href="#projects">
-            <button className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-8 py-3 rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/30 transition-transform duration-300">
-               View Projects
+            <button className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 md:px-8 py-3 rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/30 transition-transform duration-300">
+              View Projects
             </button>
           </a>
           <a href="#contact">
-            <button className="border border-indigo-400 text-indigo-300 px-8 py-3 rounded-full hover:bg-indigo-400/10 hover:scale-105 transition-transform duration-300">
+            <button className="border border-indigo-400 text-indigo-300 px-6 md:px-8 py-3 rounded-full hover:bg-indigo-400/10 hover:scale-105 transition-transform duration-300">
               📬 Contact Me
             </button>
           </a>
@@ -90,29 +96,29 @@ export default function App() {
       </section>
 
       {/* ===== About ===== */}
-      <section id="about" className="px-8 py-28 flex justify-center">
+      <section id="about" className="px-4 md:px-8 py-20 md:py-28 flex justify-center">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="max-w-4xl bg-white/5 backdrop-blur-lg p-10 rounded-2xl border border-gray-800 shadow-lg shadow-indigo-500/10"
+          className="max-w-4xl bg-white/5 backdrop-blur-lg p-8 md:p-10 rounded-2xl border border-gray-800 shadow-lg shadow-indigo-500/10"
         >
-          <h3 className="text-3xl font-bold mb-6 text-indigo-400">About Me</h3>
-          <p className="text-gray-300 leading-relaxed mb-4">
-            I’m an <strong>AI Engineer</strong> passionate about merging intelligent algorithms with physical systems.
+          <h3 className="text-2xl md:text-3xl font-bold mb-6 text-indigo-400">About Me</h3>
+          <p className="text-gray-300 leading-relaxed mb-4 text-sm md:text-base">
+            I’m an <strong>AI & Data Science Engineer</strong> passionate about merging intelligent algorithms with physical systems.
             I design end-to-end AI + IoT solutions that learn from sensors, analyze data in real time, and automate smart devices.
           </p>
-          <ul className="text-gray-400 space-y-2">
-            <li>🎓 <strong>Education:</strong> NTI & DataCamp — Advanced ML & DL Training</li>
+          <ul className="text-gray-400 space-y-2 text-sm md:text-base">
+            <li>🎓 <strong>Education:</strong> Faculty of Computer and Data Science, Alexandria University</li>
             <li>🧠 <strong>Experience:</strong> Real-world projects in EMG signal processing, IoT control, and cloud deployment.</li>
           </ul>
         </motion.div>
       </section>
 
       {/* ===== Projects ===== */}
-      <section id="projects" className="px-8 py-28">
-        <h3 className="text-3xl font-bold mb-10 text-indigo-400 text-center">Projects</h3>
-        <div className="grid md:grid-cols-3 gap-10">
+      <section id="projects" className="px-4 md:px-8 py-20 md:py-28">
+        <h3 className="text-2xl md:text-3xl font-bold mb-10 text-indigo-400 text-center">Projects</h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
           {projects.map((proj, i) => (
             <motion.a 
               key={i}
@@ -120,9 +126,9 @@ export default function App() {
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
-              className="bg-white/5 backdrop-blur-lg p-8 rounded-2xl border border-gray-700 hover:border-indigo-400 hover:shadow-indigo-400/30 hover:shadow-lg transition block"
+              className="bg-white/5 backdrop-blur-lg p-6 md:p-8 rounded-2xl border border-gray-700 hover:border-indigo-400 hover:shadow-indigo-400/30 hover:shadow-lg transition block"
             >
-              <h4 className="text-xl font-semibold mb-3 text-white">{proj.title}</h4>
+              <h4 className="text-lg md:text-xl font-semibold mb-3 text-white">{proj.title}</h4>
               <p className="text-gray-400 mb-4 text-sm">{proj.desc}</p>
               <p className="text-xs text-indigo-300">{proj.tech}</p>
             </motion.a>
@@ -131,14 +137,14 @@ export default function App() {
       </section>
 
       {/* ===== Skills ===== */}
-      <section id="skills" className="px-8 py-24 bg-[#0e1530]/70 backdrop-blur-md">
-        <h3 className="text-3xl font-bold mb-10 text-indigo-400 text-center">Skills</h3>
-        <div className="flex flex-wrap justify-center gap-4">
+      <section id="skills" className="px-4 md:px-8 py-20 md:py-24 bg-[#0e1530]/70 backdrop-blur-md">
+        <h3 className="text-2xl md:text-3xl font-bold mb-10 text-indigo-400 text-center">Skills</h3>
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4">
           {skills.map((skill, i) => (
             <motion.span
               key={i}
               whileHover={{ scale: 1.1 }}
-              className="bg-[#0b1220] border border-gray-700 px-5 py-2 rounded-full text-sm hover:border-indigo-400 transition"
+              className="bg-[#0b1220] border border-gray-700 px-4 md:px-5 py-2 rounded-full text-xs md:text-sm hover:border-indigo-400 transition"
             >
               {skill}
             </motion.span>
@@ -147,9 +153,9 @@ export default function App() {
       </section>
 
       {/* ===== Contact ===== */}
-      <section id="contact" className="px-8 py-28 text-center bg-gradient-to-b from-[#0b1220] to-[#121a2f]">
-        <h3 className="text-3xl font-bold mb-6 text-indigo-400">Contact Me</h3>
-        <div className="space-y-2 text-lg">
+      <section id="contact" className="px-4 md:px-8 py-20 md:py-28 text-center bg-gradient-to-b from-[#0b1220] to-[#121a2f]">
+        <h3 className="text-2xl md:text-3xl font-bold mb-6 text-indigo-400">Contact Me</h3>
+        <div className="space-y-2 text-base md:text-lg">
           <p className="text-gray-300">
             📧 <a href="mailto:abdoibrahim122000@gmail.com" className="text-indigo-400 hover:underline">abdoibrahim122000@gmail.com</a>
           </p>
@@ -163,7 +169,7 @@ export default function App() {
       </section>
 
       {/* ===== Footer ===== */}
-      <footer className="border-t border-gray-800 py-6 text-center text-gray-500 text-sm bg-[#0b1220]">
+      <footer className="border-t border-gray-800 py-6 text-center text-gray-500 text-xs md:text-sm bg-[#0b1220]">
         © 2025 Abdelrhman Ahmed — All rights reserved
       </footer>
     </div>
