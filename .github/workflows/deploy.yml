@@ -1,0 +1,105 @@
+# Publishes abdoahmed666.github.io/my-portfolio from the
+# AI_Engineer_Universe source.
+#
+# This address is the one in the CV, so it keeps working and now shows the
+# current site instead of the old one. The repository's previous Vite source
+# is left where it is; only what Pages serves changes.
+#
+# The site's source lives in its own repository and is not duplicated here:
+# this workflow checks it out, builds the static export, and hands the result
+# to Pages. That keeps one source of truth — the repository the work actually
+# happens in — at the cost of this not firing by itself when that repository
+# is pushed. Run it from the Actions tab, or see the note at the bottom for
+# making it automatic.
+name: Deploy portfolio
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or tag of AI_Engineer_Universe to publish
+        required: false
+        default: main
+  # A safety net, so a forgotten manual run is at most a day stale.
+  schedule:
+    - cron: "0 5 * * *"
+  # Lets the source repository trigger this once a token is configured.
+  repository_dispatch:
+    types: [source-updated]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; let a newer one win.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the site source
+        uses: actions/checkout@v4
+        with:
+          repository: AbdoAhmed666/AI_Engineer_Universe
+          ref: ${{ github.event.inputs.ref || 'main' }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # STATIC_EXPORT makes next.config emit `out/` instead of a server build.
+      # A project site is served from /<repo>/, so the build has to be told
+      # its prefix — without it the page loads its HTML and none of its
+      # JavaScript — and its own origin, so the share card resolves.
+      - name: Build the static export
+        run: STATIC_EXPORT=1 npm run build
+        env:
+          BASE_PATH: /my-portfolio
+          NEXT_PUBLIC_SITE_URL: https://abdoahmed666.github.io/my-portfolio
+
+      # The share card exports as an extensionless file, which a static host
+      # serves as application/octet-stream — and link scrapers reject that, so
+      # the preview silently shows nothing. Copy it to a .png that gets the
+      # right type, point the tags at the copy, and leave the original in
+      # place so neither URL 404s.
+      - name: Give the share card a servable extension
+        run: |
+          cp out/opengraph-image out/opengraph-image.png
+          cp out/twitter-image  out/twitter-image.png
+          sed -i 's#/opengraph-image?#/opengraph-image.png?#g; s#/twitter-image?#/twitter-image.png?#g' out/*.html
+
+      # Belt and braces: Pages' own deploy path does not run Jekyll, but
+      # Jekyll would drop every `_next/` asset if it ever did.
+      - run: touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+# To deploy automatically on every push to AI_Engineer_Universe, add a
+# workflow there that calls this one:
+#
+#   curl -X POST -H "Authorization: Bearer $TOKEN" \
+#     -H "Accept: application/vnd.github+json" \
+#     https://api.github.com/repos/AbdoAhmed666/abdoahmed666.github.io/dispatches \
+#     -d '{"event_type":"source-updated"}'
+#
+# where TOKEN is a fine-grained PAT with Contents: read-and-write on this
+# repository, stored as a secret in AI_Engineer_Universe.
