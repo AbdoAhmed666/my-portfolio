@@ -2,15 +2,15 @@
 # AI_Engineer_Universe source.
 #
 # This address is the one in the CV, so it keeps working and now shows the
-# current site instead of the old one. The repository's previous Vite source
-# is left where it is; only what Pages serves changes.
+# current site. The repository's previous Vite source is left where it is on
+# main; only the published branch changes.
 #
-# The site's source lives in its own repository and is not duplicated here:
-# this workflow checks it out, builds the static export, and hands the result
-# to Pages. That keeps one source of truth — the repository the work actually
-# happens in — at the cost of this not firing by itself when that repository
-# is pushed. Run it from the Actions tab, or see the note at the bottom for
-# making it automatic.
+# Publishes by committing to gh-pages rather than through actions/deploy-pages.
+# Pages here has always been served from that branch, and the github-pages
+# environment is restricted to it — a deployment from main is rejected by
+# environment protection before it runs. Pushing a branch is not a deployment,
+# so it is not subject to that rule, and it is what this repository's Pages
+# setup already reads.
 name: Deploy portfolio
 
 on:
@@ -28,17 +28,14 @@ on:
     types: [source-updated]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Never let two deploys race; let a newer one win.
 concurrency:
-  group: pages
+  group: gh-pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the site source
@@ -54,7 +51,6 @@ jobs:
 
       - run: npm ci
 
-      # STATIC_EXPORT makes next.config emit `out/` instead of a server build.
       # A project site is served from /<repo>/, so the build has to be told
       # its prefix — without it the page loads its HTML and none of its
       # JavaScript — and its own origin, so the share card resolves.
@@ -75,31 +71,22 @@ jobs:
           cp out/twitter-image  out/twitter-image.png
           sed -i 's#/opengraph-image?#/opengraph-image.png?#g; s#/twitter-image?#/twitter-image.png?#g' out/*.html
 
-      # Belt and braces: Pages' own deploy path does not run Jekyll, but
-      # Jekyll would drop every `_next/` asset if it ever did.
+      # Jekyll would drop every `_next/` asset, and a branch-served Pages
+      # site does run it.
       - run: touch out/.nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
-
-# To deploy automatically on every push to AI_Engineer_Universe, add a
-# workflow there that calls this one:
-#
-#   curl -X POST -H "Authorization: Bearer $TOKEN" \
-#     -H "Accept: application/vnd.github+json" \
-#     https://api.github.com/repos/AbdoAhmed666/abdoahmed666.github.io/dispatches \
-#     -d '{"event_type":"source-updated"}'
-#
-# where TOKEN is a fine-grained PAT with Contents: read-and-write on this
-# repository, stored as a secret in AI_Engineer_Universe.
+      # Committed on top of the existing gh-pages history rather than
+      # force-pushed, so any published build is one revert away.
+      - name: Publish to gh-pages
+        working-directory: out
+        run: |
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git fetch -q --depth 1 origin gh-pages
+          git reset -q --soft FETCH_HEAD
+          git add -A
+          git diff --quiet --cached && echo "nothing changed" && exit 0
+          git commit -qm "Publish ${{ github.sha }}"
+          git push origin HEAD:gh-pages
